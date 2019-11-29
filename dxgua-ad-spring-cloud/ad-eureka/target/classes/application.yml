@@ -1,0 +1,66 @@
+##单机节点
+spring:
+  application:
+    name: ad-eureka
+
+server:
+  port: 8000
+
+##默认true,是否从Eureka server获取注册信息 fetch-registry
+##默认true,是否将自己注册到Eureka server   register-with-eureka
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}/${server.port}/eureka/
+
+---
+## 集群
+
+# profiles 启动程序的时候，打成jar包，使用profiles启动对应的配置文件的服务
+spring:
+  application:
+    name: ad-eureka
+  profiles: server1
+server:
+  port: 8000
+eureka:
+  instance:
+    hostname: server1
+    prefer-ip-address: false
+  client:
+    service-url:
+      defaultZone: http://server2:8001/eureka/,http://server3:8002/eureka/
+
+---
+spring:
+  application:
+    name: ad-eureka
+  profiles: server2
+server:
+  port: 8001
+eureka:
+  instance:
+    hostname: server2
+    prefer-ip-address: false
+  client:
+    service-url:
+      defaultZone: http://server1:8000/eureka/,http://server3:8002/eureka/
+
+---
+spring:
+  application:
+    name: ad-eureka
+  profiles: server3
+server:
+  port: 8002
+eureka:
+  instance:
+    hostname: server3
+    prefer-ip-address: false
+  client:
+    service-url:
+      defaultZone: http://server1:8000/eureka/,http://server2:8001/eureka/
